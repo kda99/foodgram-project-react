@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'recipes',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -142,3 +143,6 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
 }
+
+
+AUTH_USER_MODEL = "users.User"
