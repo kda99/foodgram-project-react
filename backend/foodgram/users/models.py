@@ -32,31 +32,30 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username', 'last_name', 'first_name', ]
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['id']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
 
 
-# class Subscription(models.Model):
-#     """Подписки на авторов."""
-#
-#     user = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='follower',
-#         verbose_name='Подписчик',
-#     )
-#     author = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='following',
-#         verbose_name='Автор, на которого подписываются',
-#     )
-#
-#     class Meta:
-#         verbose_name = 'Подписка'
-#         verbose_name_plural = 'Подписки'
-#         constraints = [
-#             UniqueConstraint(fields=['user', 'author'], name='unique_subscription'),
-#         ]
+class Subscription(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='followed',
+        verbose_name='Подписываемый автор',
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['user', 'author'], name='unique_subscription'),
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
