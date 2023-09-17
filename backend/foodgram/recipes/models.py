@@ -1,8 +1,13 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
+# from django.contrib.auth import get_user_model
 import re
 
 from django.db.models import UniqueConstraint
+
+from users.models import User
+# User = get_user_model()
 
 
 def validate_hex_color(value):
@@ -37,4 +42,50 @@ class Tag(models.Model):
                              name='unique_tag')
         ]
 
+    def __str__(self):
+        return self.name
 
+
+class Recipe(models.Model):
+    tags = models.ManyToManyField(
+        Tag,
+        related_name='recipes',
+        verbose_name='Теги',
+    )
+    author = models.ForeignKey(
+        User,
+        related_name='recipes',
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+    )
+    # ingredients = models.ManyToManyField(
+    #
+    # )
+    # is_favorited = models.BooleanField(
+    #     default=False,
+    #
+    # )
+    # is_in_shopping_cart = models.BooleanField(
+    #     default=False,
+    # )
+    name = models.CharField(
+        'Название блюда',
+        max_length=200,
+        unique=True,
+    )
+    # image = models.ImageField(
+    #     'Фото',
+    #     upload_to='recipes/',
+    # )
+    text = models.TextField(
+        'Описание',
+    )
+    cooking_time = models.PositiveIntegerField(
+        'Время приготовления блюда в минутах',
+        validators=[MinValueValidator(1, 'Время приготовления блюда должно'
+                                         ' быть не менее 1 минуты'),],
+    )
+    # pub_date = models.DateTimeField(
+    #     'Дата рецепта',
+    #     auto_now_add=True,
+    # )
