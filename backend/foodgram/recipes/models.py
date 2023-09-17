@@ -61,13 +61,13 @@ class Recipe(models.Model):
     # ingredients = models.ManyToManyField(
     #
     # )
-    # is_favorited = models.BooleanField(
-    #     default=False,
-    #
-    # )
-    # is_in_shopping_cart = models.BooleanField(
-    #     default=False,
-    # )
+    is_favorited = models.BooleanField(
+        default=False,
+
+    )
+    is_in_shopping_cart = models.BooleanField(
+        default=False,
+    )
     name = models.CharField(
         'Название блюда',
         max_length=200,
@@ -85,7 +85,7 @@ class Recipe(models.Model):
         validators=[MinValueValidator(1, 'Время приготовления блюда должно'
                                          ' быть не менее 1 минуты'),],
     )
-    # pub_date = models.DateTimeField(
-    #     'Дата рецепта',
-    #     auto_now_add=True,
-    # )
+    pub_date = models.DateTimeField(
+        'Дата рецепта',
+        auto_now_add=True,
+    )
