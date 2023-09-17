@@ -58,9 +58,9 @@ class Recipe(models.Model):
         verbose_name='Автор',
         on_delete=models.CASCADE,
     )
-    ingredients = models.ManyToManyField(
-
-    )
+    # ingredients = models.ManyToManyField(
+    #
+    # )
     is_favorited = models.BooleanField(
         default=False,
 
