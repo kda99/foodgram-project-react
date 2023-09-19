@@ -1,7 +1,11 @@
 from django.contrib import admin
 
-from recipes.models import Tag, Recipe
+from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient
 
+
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    extra = 1
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -22,3 +26,17 @@ class RecipeAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('author', 'name', 'tags')
+    list_display_links = ('name',)
+    inlines = [
+        RecipeIngredientInline,
+    ]
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'measurement_unit',
+    )
+    search_fields = ('name',)
+    list_filter = ('name', 'measurement_unit')

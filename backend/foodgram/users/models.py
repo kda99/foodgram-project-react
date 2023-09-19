@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import UniqueConstraint
 from django.db import models
 
@@ -27,6 +28,11 @@ class User(AbstractUser):
         blank=False,
         null=False,
     )
+    is_subscribed = models.BooleanField(
+       'Подписан ли текущий пользователь на этого',
+        default=False,
+ )
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'last_name', 'first_name', ]

@@ -1,12 +1,14 @@
+import re
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 # from django.contrib.auth import get_user_model
-import re
 
 from django.db.models import UniqueConstraint
 
 from users.models import User
+
+
 # User = get_user_model()
 
 
@@ -33,6 +35,7 @@ class Tag(models.Model):
         max_length=200,
         unique=True,
     )
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Тег'
@@ -43,7 +46,31 @@ class Tag(models.Model):
         ]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
+
+
+class Ingredient(models.Model):
+    name = models.CharField(
+        'Название ингредиента',
+        max_length=200,
+        unique=True,
+    )
+    measurement_unit = models.CharField(
+        'Единица измерения',
+        max_length=200,
+    )
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            UniqueConstraint(fields=['name', 'measurement_unit'],
+                             name='unique_ingredient')
+        ]
+
+    def __str__(self):
+        return str(self.name) + ' ' + str(self.measurement_unit)
 
 
 class Recipe(models.Model):
@@ -58,9 +85,12 @@ class Recipe(models.Model):
         verbose_name='Автор',
         on_delete=models.CASCADE,
     )
-    # ingredients = models.ManyToManyField(
-    #
-    # )
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        related_name='recipes',
+        verbose_name='Ингредиенты',
+        through='RecipeIngredient',
+    )
     is_favorited = models.BooleanField(
         default=False,
 
@@ -73,19 +103,52 @@ class Recipe(models.Model):
         max_length=200,
         unique=True,
     )
-    # image = models.ImageField(
-    #     'Фото',
-    #     upload_to='recipes/',
-    # )
+    image = models.ImageField(
+        'Фото',
+        upload_to='recipes/',
+    )
     text = models.TextField(
         'Описание',
     )
     cooking_time = models.PositiveIntegerField(
         'Время приготовления блюда в минутах',
         validators=[MinValueValidator(1, 'Время приготовления блюда должно'
-                                         ' быть не менее 1 минуты'),],
+                                         ' быть не менее 1 минуты'), ],
     )
     pub_date = models.DateTimeField(
         'Дата рецепта',
         auto_now_add=True,
     )
+
+
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        constraints = [
+            UniqueConstraint(fields=['name', 'author'], name='unique_recipe'),
+        ]
+    def __str__(self):
+        return str(self.name)
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='recipe_ingredients',
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name='Ингредиент',
+        on_delete=models.CASCADE,
+    )
+    amount = models.PositiveIntegerField(
+        'Количество',
+        validators=[MinValueValidator(1, 'Количество не может быть меньше 1')],
+    )
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Количество ингредиента в рецепте'
