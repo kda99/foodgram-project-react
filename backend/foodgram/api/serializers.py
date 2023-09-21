@@ -6,7 +6,7 @@ from users.models import User
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('name', 'color', 'slug')
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -19,17 +19,17 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-# class AuthorRecipeSerializer(serializers.ModelSerializer):
-#     name
-#     class Meta:
-#         model = User
-#         fields = ('id', 'name', 'image')
+class AuthorRecipeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientSerializer(many=True, source='recipe_ingredients')
-    # author = AuthorRecipeSerializer()
+    author = AuthorRecipeSerializer()
 
     class Meta:
         model = Recipe
