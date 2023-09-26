@@ -18,13 +18,8 @@ class TagIdSerializer(serializers.ModelSerializer):
         fields = ('id',)
 
 
+
 class IngredientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ingredient
-        fields = ('id', 'name', 'measurement_unit')
-
-
-class IngredientCreateRecipeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient.id')
     class Meta:
         model = RecipeIngredient
@@ -61,12 +56,25 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(),)
-    ingredients = IngredientCreateRecipeSerializer(many=True, source='recipe_ingredients', read_only=True)
+    # tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), read_only=False)
+    ingredients = IngredientSerializer(many=True, source='recipe_ingredients', read_only=True)
 
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',)
 
+    def create(self, validated_data):
+        ingredients = self.initial_data.get('ingredients')
+        tags = validated_data.pop('tags')
 
-        
+        recipe = Recipe.objects.create(
+            **validated_data
+        )
+        for ingredient in ingredients:
+            RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            ).save()
+        recipe.tags.set(tags)
+        return recipe
