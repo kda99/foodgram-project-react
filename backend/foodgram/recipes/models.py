@@ -153,3 +153,33 @@ class RecipeIngredient(models.Model):
     class Meta:
         ordering = ['id']
         verbose_name = 'Количество ингредиента в рецепте'
+
+
+class Favorite(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='favorites',
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User,
+        related_name='favorites',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe', 'user', ),
+                name='unique_favorite',
+            ),
+        )
+
+    def __str__(self):
+        return str(self.recipe.name)
