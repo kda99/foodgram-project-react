@@ -1,14 +1,80 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, get_object_or_404
 from djoser.views import UserViewSet
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.serializers import TagSerializer, RecipeSerializer, RecipeCreateSerializer, IngredientSerializer
+from api.serializers import TagSerializer, RecipeSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer
 from recipes.models import Tag, Recipe, Ingredient
+from users.models import User, Subscription
+from api.pagination import CustomPagination
+
 
 
 class CustomUserViewSet(UserViewSet):
-    pass
+    queryset = User.objects.all()
+    pagination_class = CustomPagination
+
+    @action(
+        detail=False,
+        permission_classes=[IsAuthenticated]
+    )
+    def subscriptions(self, request):
+        users = User.objects.filter(
+            followed__user=request.user
+        ).prefetch_related('recipes')
+        page = self.paginate_queryset(users)
+
+        if page is not None:
+            serializer = UserSubscripterSeralizer(
+                page, many=True,
+                context={'request': request})
+
+            return self.get_paginated_response(serializer.data)
+
+        serializer = UserSubscripterSeralizer(
+            users, many=True, context={'request': request}
+        )
+
+        return Response(serializer.data)
+
+    @action(
+        ["POST", "DELETE"],
+        detail=True,
+    )
+    def subscribe(self, request, **kwargs):
+        user = get_object_or_404(User, id=kwargs.get('id'))
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            author=user
+        )
+        if request.method == 'POST':
+            if user == request.user:
+                error = {
+                    'errors': 'Нельзя подписаться на себя.'
+                }
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            obj, created = Subscription.objects.get_or_create(
+                user=request.user,
+                author=user
+            )
+            if not created:
+                error = {
+                    'errors': 'Вы уже подписаны на этого автора'
+                }
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            serializer = SubscriptionShowSerializer(obj, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if not subscription:
+            error = {
+                'errors': 'Вы не подписаны на этого автора.'
+            }
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(ModelViewSet):
