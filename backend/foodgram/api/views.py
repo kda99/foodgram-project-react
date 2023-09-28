@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.serializers import TagSerializer, RecipeSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer
+from api.serializers import TagSerializer, RecipeSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
 from recipes.models import Tag, Recipe, Ingredient, Favorite
 from users.models import User, Subscription
 from api.pagination import CustomPagination
@@ -16,6 +16,21 @@ from api.pagination import CustomPagination
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = CustomPagination
+
+
+    def get_serializer_class(self):
+
+        if self.action in ['set_password']:
+            return PasswordSetSerializer
+
+        elif self.request.method == 'GET':
+
+            return UserGetSerializer
+
+        elif self.request.method == 'POST':
+
+            return UserCreateSerializer
+
 
     @action(
         detail=False,

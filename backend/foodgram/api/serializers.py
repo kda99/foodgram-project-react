@@ -195,3 +195,32 @@ class SubscriptionShowSerializer(serializers.ModelSerializer):
     def get_recipes_count(self, obj):
         return obj.author.recipes.count()
 
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+
+
+class PasswordSetSerializer(UserSerializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
+    class Meta:
+        model = User
+        fields = ('current_password', 'new_password',)
+
+    def validate(self, data):
+        user = self.context['request'].user
+
+        if not user.check_password(data['current_password']):
+            raise serializers.ValidationError("Неверный старый пароль.")
+
+        return data
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance
+
