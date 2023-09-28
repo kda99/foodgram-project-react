@@ -98,14 +98,13 @@ class TagViewSet(ModelViewSet):
 
 
 
-class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
-
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):

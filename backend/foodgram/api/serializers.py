@@ -21,10 +21,10 @@ class TagIdSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='ingredient.id')
+    # id = serializers.IntegerField(source='ingredient.id')
     class Meta:
-        model = RecipeIngredient
-        fields = ('id', 'amount')
+        model = Ingredient
+        fields = '__all__'
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -37,19 +37,11 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-# class AuthorRecipeSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = User
-#         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
-
-
-
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
     image = Base64ImageField()
-    # tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), read_only=False)
-    ingredients = IngredientSerializer(many=True, source='recipe_ingredients', read_only=True)
+    ingredients = RecipeIngredientSerializer(many=True, source='recipe_ingredients', read_only=True)
 
     class Meta:
         model = Recipe
@@ -89,11 +81,11 @@ class UserGetSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
+        if not request.user.is_authenticated:
             return False
 
         return Subscription.objects.filter(
-            author=obj, user=request.user
+            user=request.user, author=obj
         ).exists()
 
 
