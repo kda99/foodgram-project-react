@@ -170,7 +170,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные'
 
@@ -191,7 +191,7 @@ class Cart(models.Model):
         related_name='cart',
         verbose_name='Подписчик',
         on_delete=models.CASCADE,
-            )
+    )
     recipe = models.ForeignKey(
         Recipe,
         related_name='cart',
