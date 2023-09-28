@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from api.serializers import TagSerializer, RecipeSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
-from recipes.models import Tag, Recipe, Ingredient, Favorite
+from recipes.models import Tag, Recipe, Ingredient, Favorite, Cart
 from users.models import User, Subscription
 from api.pagination import CustomPagination
 
@@ -142,5 +142,39 @@ class RecipeViewSet(ModelViewSet):
             error = {'errors': 'Рецепта нет в избранном.'}
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
         favorite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=True,
+        methods=('POST', 'DELETE'),
+        # url_path='shopping_cart',
+    )
+    def shopping_cart(self, request, pk=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        cart = Cart.objects.filter(
+            user=user,
+            recipe=recipe
+        )
+        if request.method == 'POST':
+            if cart.exists():
+                error = {
+                    'errors':
+                        'Рецепт уже в корзине.'
+                }
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            Cart(
+                user=user,
+                recipe=recipe
+            ).save()
+            serializer = RecipeSubscriptionsSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if not cart.exists():
+            error = {
+                'errors':
+                    'Этого рецепта нет в корзине.'
+            }
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
