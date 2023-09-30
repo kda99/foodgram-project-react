@@ -1,3 +1,4 @@
+from django.db.models import Sum, F
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status
@@ -6,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.serializers import TagSerializer, RecipeSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
-from recipes.models import Tag, Recipe, Ingredient, Favorite, Cart
+from api.serializers import TagSerializer, RecipeSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
+from recipes.models import Tag, Recipe, Ingredient, Favorite, Cart, RecipeIngredient
 from users.models import User, Subscription
 from api.pagination import CustomPagination
 
@@ -108,6 +109,7 @@ class RecipeViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):
+
             return RecipeCreateSerializer
         return RecipeSerializer
 
@@ -178,3 +180,28 @@ class RecipeViewSet(ModelViewSet):
         cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        detail=False,
+        methods=('GET',),
+    )
+    def download_shopping_cart(self, request):
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__cart__user=request.user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit',
+            'amount',
+        ).annotate(
+            total_amount=Sum('amount')
+        )
+        list = []
+        for ingredient in ingredients:
+            list.append(
+                f'{ingredient["ingredient__name"]} - '
+                f'{ingredient["amount"]} '
+                f'{ingredient["ingredient__measurement_unit"]}'
+            )
+        content = 'Список покупок:\n\n' + '\n'.join(list)
+        filename = 'Cart.txt'
+        request = HttpResponse(content, content_type='text/plain')
+        request['Content-Disposition'] = f'attachment; filename={filename}'
+        return request
