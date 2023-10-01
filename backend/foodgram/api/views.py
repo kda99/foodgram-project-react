@@ -7,11 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.serializers import TagSerializer, RecipeSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
+from api.serializers import TagSerializer, RecipeSerializer, CartSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
 from recipes.models import Tag, Recipe, Ingredient, Favorite, Cart, RecipeIngredient
 from users.models import User, Subscription
 from api.pagination import CustomPagination
 
+from api.filter import RecipeFilter
 
 
 class CustomUserViewSet(UserViewSet):
@@ -106,6 +107,7 @@ class IngredientsViewSet(ModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):
@@ -205,3 +207,11 @@ class RecipeViewSet(ModelViewSet):
         request = HttpResponse(content, content_type='text/plain')
         request['Content-Disposition'] = f'attachment; filename={filename}'
         return request
+
+
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Cart.objects.filter(user=user)

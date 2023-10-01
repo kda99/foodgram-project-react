@@ -4,7 +4,9 @@ from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient
+
+
+from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient, Cart
 from users.models import User, Subscription
 
 
@@ -228,3 +230,11 @@ class PasswordSetSerializer(UserSerializer):
         instance.save()
         return instance
 
+class CartSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='recipe.name')
+    image = Base64ImageField(source='recipe.image')
+    cooking_time = serializers.ReadOnlyField(source='recipe.cooking_time')
+    is_in_shopping_cart = serializers.BooleanField(source='recipe.is_in_shopping_cart')
+    class Meta:
+        model = Cart
+        fields = ('name', 'image', 'cooking_time', 'is_in_shopping_cart')

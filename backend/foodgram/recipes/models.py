@@ -9,7 +9,6 @@ from django.db.models import UniqueConstraint
 from users.models import User
 
 
-# User = get_user_model()
 
 
 def validate_hex_color(value):
