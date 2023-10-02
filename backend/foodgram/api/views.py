@@ -1,5 +1,6 @@
-from django.db.models import Sum, F
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.db.models import Sum
+from django.shortcuts import HttpResponse, get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -11,7 +12,6 @@ from api.serializers import TagSerializer, RecipeSerializer, CartSerializer, Rec
 from recipes.models import Tag, Recipe, Ingredient, Favorite, Cart, RecipeIngredient
 from users.models import User, Subscription
 from api.pagination import CustomPagination
-
 from api.filter import RecipeFilter
 
 
@@ -107,6 +107,7 @@ class IngredientsViewSet(ModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
+    filter_backends = DjangoFilterBackend,
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
