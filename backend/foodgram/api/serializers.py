@@ -1,7 +1,7 @@
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient
+from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient, Cart
 from users.models import User, Subscription
 
 from drf_extra_fields.fields import Base64ImageField
@@ -238,3 +238,8 @@ class PasswordSetSerializer(UserSerializer):
         instance.save()
         return instance
 
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ('user', 'recipe')

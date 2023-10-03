@@ -47,7 +47,7 @@ class User(AbstractUser):
     is_subscribed = models.BooleanField(
        'Подписан ли текущий пользователь на этого',
         default=False,
- )
+    )
 
 
     USERNAME_FIELD = 'email'

@@ -185,4 +185,21 @@ class Favorite(models.Model):
         return str(self.recipe.name)
 
 
+class Cart(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='carts',
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User,
+        related_name='carts',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+    )
 
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
