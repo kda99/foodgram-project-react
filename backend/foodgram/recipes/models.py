@@ -9,6 +9,7 @@ from django.db.models import UniqueConstraint
 from users.models import User
 
 
+# User = get_user_model()
 
 
 def validate_hex_color(value):
@@ -104,7 +105,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         'Фото',
-        upload_to='recipes_photos/',
+        upload_to='recipes/photos',
     )
     text = models.TextField(
         'Описание',
@@ -169,7 +170,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['id']
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные'
 
@@ -184,27 +185,4 @@ class Favorite(models.Model):
         return str(self.recipe.name)
 
 
-class Cart(models.Model):
-    user = models.ForeignKey(
-        User,
-        related_name='cart',
-        verbose_name='Подписчик',
-        on_delete=models.CASCADE,
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        related_name='cart',
-        verbose_name='Рецепт',
-        on_delete=models.CASCADE
-    )
 
-    class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique_cart',
-            ),
-        )
-
-    def __str__(self):
-        return f'{self.user.username} - {self.recipe.name}'
