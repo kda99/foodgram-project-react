@@ -78,6 +78,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
     class Meta:
+        model = Recipe
         fields = (
             'id',
             'tags',
@@ -90,7 +91,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'is_favorited',
             # 'is_in_shopping_cart'
         )
-        model = Recipe
+
 
 
     def get_is_favorited(self, recipe):
