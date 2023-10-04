@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
@@ -37,18 +38,75 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-
-class RecipeCreateSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
-    ingredients = RecipeIngredientSerializer(many=True, source='recipe_ingredients', read_only=True)
+class UserGetSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+
+        return Subscription.objects.filter(
+            user=request.user, author=obj
+        ).exists()
+
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
+    author = UserGetSerializer(many=False, read_only=True)
+    image = Base64ImageField()
+    ingredients = RecipeIngredientSerializer(many=True, source='recipe_ingredients', read_only=True)
+    is_favorited = serializers.SerializerMethodField(
+        read_only=True,
+        method_name='get_is_favorited'
+    )
+    # is_in_shopping_cart = serializers.SerializerMethodField(
+    #     read_only=True,
+    #     method_name='get_is_in_shopping_cart'
+    # )
+
+
+    class Meta:
+        fields = (
+            'id',
+            'tags',
+            'ingredients',
+            'author',
+            'name',
+            'image',
+            'text',
+            'cooking_time',
+            'is_favorited',
+            # 'is_in_shopping_cart'
+        )
         model = Recipe
-        fields = ('ingredients', 'tags', 'image', 'name', 'text', 'cooking_time',)
+
+
+    def get_is_favorited(self, recipe):
+        user = self.context['request'].user
+        return (not user.is_anonymous
+                and recipe.favorite.filter(user=user).exists())
+
+    # def get_is_in_shopping_cart(self, recipe):
+    #     user = self.context['request'].user
+    #     return (not user.is_anonymous
+    #             and recipe.cart.filter(author=user).exists())
+
 
     def create(self, validated_data):
         ingredients = self.initial_data.get('ingredients')
-        tags = validated_data.pop('tags')
+        tags_data = validated_data.pop('tags')
 
         recipe = Recipe.objects.create(
             **validated_data
@@ -62,8 +120,18 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             for ingredient in ingredients
         ]
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
+        tag_name = [tag.name for tag in tags_data]
+        tags = Tag.objects.filter(name__in=tag_name)
         recipe.tags.set(tags)
         return recipe
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        tags = instance.tags.all()
+        tag_serializer = TagSerializer(tags, many=True)
+        representation['tags'] = tag_serializer.data
+        return representation
 
 
 
@@ -87,28 +155,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 
-class UserGetSerializer(UserSerializer):
-    is_subscribed = serializers.SerializerMethodField()
 
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-        )
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if not request.user.is_authenticated:
-            return False
-
-        return Subscription.objects.filter(
-            user=request.user, author=obj
-        ).exists()
 
 
 class RecipeSubscriptionsSerializer(serializers.ModelSerializer):
