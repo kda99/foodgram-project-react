@@ -20,12 +20,12 @@ class RecipeFilter(rest_framework.FilterSet):
         queryset=Tag.objects.all()
     )
 
-    def get_favorited_filter(self, queryset, name, value):
+    def get_favorited_filter(self, queryset, value):
         if value:
             return queryset.filter(favorite__user=self.request.user)
         return queryset
 
-    def get_shopping_cart_filter(self, queryset, name, value):
+    def get_shopping_cart_filter(self, queryset, value):
         if value:
             return queryset.filter(carts__user=self.request.user)
         return queryset

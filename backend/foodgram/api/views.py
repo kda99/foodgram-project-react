@@ -36,6 +36,7 @@ from api.filter import RecipeFilter
 
 
 class CustomUserViewSet(UserViewSet):
+    # lookup_field = 'id'
     queryset = User.objects.all()
     pagination_class = CustomPagination
 
@@ -99,13 +100,24 @@ class CustomUserViewSet(UserViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
     @action(detail=False, methods=['GET'])
-    def subscriptions(self, request, pk=None):
-        # Логика для получения подписок пользователя
-        user = self.get_object()
-        subscriptions = Subscription.objects.filter(user=user)
-        serializer = SubscriptionShowSerializer(subscriptions, many=True)
+    def subscriptions(self, request):
+        queryset = Subscription.objects.filter(user=request.user)
+        queryset = self.filter_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SubscriptionShowSerializer(
+                page, many=True, context={'request': request}
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = SubscriptionShowSerializer(
+            queryset, many=True, context={'request': request}
+        )
         return Response(serializer.data)
+
 
 
 class TagViewSet(ModelViewSet):
