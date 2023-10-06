@@ -15,23 +15,23 @@ from api.pagination import CustomPagination
 from api.filter import RecipeFilter
 
 
-class UserSubscriptionsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    # permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = SubscriptionShowSerializer
-
-    def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+# class UserSubscriptionsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+#     # permission_classes = [IsAuthenticatedOrReadOnly]
+#     serializer_class = SubscriptionShowSerializer
+#
+#     def get_queryset(self):
+#         return Subscription.objects.filter(user=self.request.user)
+#
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.filter_queryset(self.get_queryset())
+#         page = self.paginate_queryset(queryset)
+#
+#         if page is not None:
+#             serializer = self.get_serializer(page, many=True)
+#             return self.get_paginated_response(serializer.data)
+#
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -43,6 +43,9 @@ class CustomUserViewSet(UserViewSet):
 
         if self.action in ['set_password']:
             return PasswordSetSerializer
+
+        elif self.action in ['subscriptions']:
+            return SubscriptionShowSerializer
 
         elif self.request.method == 'GET':
 
@@ -111,6 +114,15 @@ class CustomUserViewSet(UserViewSet):
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+    @action(detail=False, methods=['GET'])
+    def subscriptions(self, request, pk=None):
+        # Логика для получения подписок пользователя
+        user = self.get_object()
+        subscriptions = Subscription.objects.filter(user=user)
+        serializer = SubscriptionShowSerializer(subscriptions, many=True)
+        return Response(serializer.data)
 
 
 class TagViewSet(ModelViewSet):
