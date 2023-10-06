@@ -2,7 +2,7 @@ from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,6 +13,25 @@ from recipes.models import Tag, Recipe, Ingredient, Favorite, RecipeIngredient
 from users.models import User, Subscription
 from api.pagination import CustomPagination
 from api.filter import RecipeFilter
+
+
+class UserSubscriptionsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = SubscriptionShowSerializer
+
+    def get_queryset(self):
+        return Subscription.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -34,28 +53,28 @@ class CustomUserViewSet(UserViewSet):
             return UserCreateSerializer
 
 
-    @action(
-        detail=False,
-        permission_classes=[IsAuthenticated]
-    )
-    def subscriptions(self, request):
-        users = User.objects.filter(
-            followed__user=request.user
-        ).prefetch_related('recipes')
-        page = self.paginate_queryset(users)
-
-        if page is not None:
-            serializer = UserSubscripterSeralizer(
-                page, many=True,
-                context={'request': request})
-
-            return self.get_paginated_response(serializer.data)
-
-        serializer = UserSubscripterSeralizer(
-            users, many=True, context={'request': request}
-        )
-
-        return Response(serializer.data)
+    # @action(
+    #     detail=False,
+    #     permission_classes=[IsAuthenticated]
+    # )
+    # def subscriptions(self, request):
+    #     users = User.objects.filter(
+    #         followed__user=request.user
+    #     ).prefetch_related('recipes')
+    #     page = self.paginate_queryset(users)
+    #
+    #     if page is not None:
+    #         serializer = UserSubscripterSeralizer(
+    #             page, many=True,
+    #             context={'request': request})
+    #
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = SubscriptionShowSerializer(
+    #         users, many=True, context={'request': request}
+    #     )
+    #
+    #     return Response(serializer.data)
 
     @action(
         ["POST", "DELETE"],

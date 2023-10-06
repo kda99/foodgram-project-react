@@ -2,4 +2,5 @@ Django==3.2
 djangorestframework
 djoser
 drf-extra-fields
-django_filters
+django_filter
+drf-nested-routers
