@@ -1,5 +1,6 @@
 from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
+from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status, mixins
@@ -52,7 +53,14 @@ class CustomUserViewSet(UserViewSet):
 
             return UserCreateSerializer
 
-
+    def create(self, request, *args, **kwargs):
+        password = request.data.get('password')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        user.set_password(password)  # Задаем пароль
+        user.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         ["POST", "DELETE"],
@@ -193,23 +201,39 @@ class RecipeViewSet(ModelViewSet):
         methods=('GET',),
     )
     def download_shopping_cart(self, request):
+
+        user = request.user
         ingredients = RecipeIngredient.objects.filter(
-            recipe__cart__user=request.user).values(
+            recipe__carts__user=user
+        ).values(
             'ingredient__name',
             'ingredient__measurement_unit',
-            'amount',
         ).annotate(
             total_amount=Sum('amount')
         )
-        list = []
+
+        ingredients_dict = {}
         for ingredient in ingredients:
-            list.append(
-                f'{ingredient["ingredient__name"]} - '
-                f'{ingredient["amount"]} '
-                f'{ingredient["ingredient__measurement_unit"]}'
-            )
-        content = 'Список покупок:\n\n' + '\n'.join(list)
+            name = ingredient['ingredient__name']
+            amount = ingredient['total_amount']
+            unit = ingredient['ingredient__measurement_unit']
+            if name in ingredients_dict:
+                ingredients_dict[name]['total_amount'] += amount
+            else:
+                ingredients_dict[name] = {
+                    'name': name,
+                    'total_amount': amount,
+                    'measurement_unit': unit,
+                }
+
+        content = 'Список покупок:\n\n'
+        for ingredient in ingredients_dict.values():
+            name = ingredient['name']
+            amount = ingredient['total_amount']
+            unit = ingredient['measurement_unit']
+            content += f'{name} - {amount} {unit}\n'
+
         filename = 'Cart.txt'
-        request = HttpResponse(content, content_type='text/plain')
-        request['Content-Disposition'] = f'attachment; filename={filename}'
-        return request
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={slugify(filename)}'
+        return response
