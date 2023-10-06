@@ -44,9 +44,6 @@ class CustomUserViewSet(UserViewSet):
         if self.action in ['set_password']:
             return PasswordSetSerializer
 
-        elif self.action in ['subscriptions']:
-            return SubscriptionShowSerializer
-
         elif self.request.method == 'GET':
 
             return UserGetSerializer
@@ -56,28 +53,6 @@ class CustomUserViewSet(UserViewSet):
             return UserCreateSerializer
 
 
-    # @action(
-    #     detail=False,
-    #     permission_classes=[IsAuthenticated]
-    # )
-    # def subscriptions(self, request):
-    #     users = User.objects.filter(
-    #         followed__user=request.user
-    #     ).prefetch_related('recipes')
-    #     page = self.paginate_queryset(users)
-    #
-    #     if page is not None:
-    #         serializer = UserSubscripterSeralizer(
-    #             page, many=True,
-    #             context={'request': request})
-    #
-    #         return self.get_paginated_response(serializer.data)
-    #
-    #     serializer = SubscriptionShowSerializer(
-    #         users, many=True, context={'request': request}
-    #     )
-    #
-    #     return Response(serializer.data)
 
     @action(
         ["POST", "DELETE"],
