@@ -22,14 +22,14 @@ class RecipeFilter(rest_framework.FilterSet):
 
     def get_favorited_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(favorite__author=self.request.user)
+            return queryset.filter(favorite__user=self.request.user)
         return queryset
 
-    # def get_shopping_cart_filter(self, queryset, name, value):
-    #     if value:
-    #         return queryset.filter(cart__author=self.request.user)
-    #     return queryset
-    #
-    # class Meta:
-    #     model = Recipe
-    #     fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
+    def get_shopping_cart_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(carts__user=self.request.user)
+        return queryset
+
+    class Meta:
+        model = Recipe
+        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
