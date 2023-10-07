@@ -123,34 +123,19 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
-        # url_path='shopping_cart',
     )
     def shopping_cart(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        cart = Cart.objects.filter(
-            user=user,
-            recipe=recipe
-        )
+        cart = Cart.objects.filter(user=user, recipe=recipe)
         if request.method == 'POST':
             if cart.exists():
-                error = {
-                    'errors':
-                        'Рецепт уже в корзине.'
-                }
-                return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            Cart(
-                user=user,
-                recipe=recipe
-            ).save()
+                raise ValidationError('Рецепт уже в корзине.')
+            Cart.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubscriptionsSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not cart.exists():
-            error = {
-                'errors':
-                    'Этого рецепта нет в корзине.'
-            }
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Этого рецепта нет в корзине.')
         cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
