@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -68,36 +69,53 @@ class CustomUserViewSet(UserViewSet):
         detail=True,
     )
     def subscribe(self, request, **kwargs):
-        user = get_object_or_404(User, id=kwargs.get('id'))
-        subscription = Subscription.objects.filter(
-            user=request.user,
-            author=user
-        )
+        user = self.get_object()
+        subscription = Subscription.objects.filter(user=request.user, author=user).exists()
+
         if request.method == 'POST':
             if user == request.user:
-                error = {
-                    'errors': 'Нельзя подписаться на себя.'
-                }
-                return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            obj, created = Subscription.objects.get_or_create(
-                user=request.user,
-                author=user
-            )
-            if not created:
-                error = {
-                    'errors': 'Вы уже подписаны на этого автора'
-                }
-                return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            serializer = SubscriptionShowSerializer(obj, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+                raise ValidationError('Нельзя подписаться на себя.')
+            if not subscription:
+                obj = Subscription.objects.create(user=request.user, author=user)
+                serializer = SubscriptionShowSerializer(obj, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                raise ValidationError('Вы уже подписаны на этого автора.')
         if not subscription:
-            error = {
-                'errors': 'Вы не подписаны на этого автора.'
-            }
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        subscription.delete()
+            raise ValidationError('Вы не подписаны на этого автора.')
+        Subscription.objects.filter(user=request.user, author=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # user = get_object_or_404(User, id=kwargs.get('id'))
+        # subscription = Subscription.objects.filter(
+        #     user=request.user,
+        #     author=user
+        # )
+        # if request.method == 'POST':
+        #     if user == request.user:
+        #         error = {
+        #             'errors': 'Нельзя подписаться на себя.'
+        #         }
+        #         return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        #     obj, created = Subscription.objects.get_or_create(
+        #         user=request.user,
+        #         author=user
+        #     )
+        #     if not created:
+        #         error = {
+        #             'errors': 'Вы уже подписаны на этого автора'
+        #         }
+        #         return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        #     serializer = SubscriptionShowSerializer(obj, context={'request': request})
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #
+        # if not subscription:
+        #     error = {
+        #         'errors': 'Вы не подписаны на этого автора.'
+        #     }
+        #     return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        # subscription.delete()
+        # return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
