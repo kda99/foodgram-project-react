@@ -3,13 +3,11 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status, mixins
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
 from api.serializers import TagSerializer, RecipeSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
 from recipes.models import Tag, Recipe, Ingredient, Favorite, RecipeIngredient, Cart
 from users.models import User, Subscription
@@ -17,27 +15,7 @@ from api.pagination import CustomPagination
 from api.filter import RecipeFilter
 
 
-# class UserSubscriptionsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-#     # permission_classes = [IsAuthenticatedOrReadOnly]
-#     serializer_class = SubscriptionShowSerializer
-#
-#     def get_queryset(self):
-#         return Subscription.objects.filter(user=self.request.user)
-#
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         page = self.paginate_queryset(queryset)
-#
-#         if page is not None:
-#             serializer = self.get_serializer(page, many=True)
-#             return self.get_paginated_response(serializer.data)
-#
-#         serializer = self.get_serializer(queryset, many=True)
-#         return Response(serializer.data)
-
-
 class CustomUserViewSet(UserViewSet):
-    # lookup_field = 'id'
     queryset = User.objects.all()
     pagination_class = CustomPagination
 
@@ -46,13 +24,9 @@ class CustomUserViewSet(UserViewSet):
 
         if self.action in ['set_password']:
             return PasswordSetSerializer
-
         elif self.request.method == 'GET':
-
             return UserGetSerializer
-
         elif self.request.method == 'POST':
-
             return UserCreateSerializer
 
     def create(self, request, *args, **kwargs):
@@ -71,7 +45,6 @@ class CustomUserViewSet(UserViewSet):
     def subscribe(self, request, **kwargs):
         user = self.get_object()
         subscription = Subscription.objects.filter(user=request.user, author=user).exists()
-
         if request.method == 'POST':
             if user == request.user:
                 raise ValidationError('Нельзя подписаться на себя.')
@@ -86,62 +59,25 @@ class CustomUserViewSet(UserViewSet):
         Subscription.objects.filter(user=request.user, author=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # user = get_object_or_404(User, id=kwargs.get('id'))
-        # subscription = Subscription.objects.filter(
-        #     user=request.user,
-        #     author=user
-        # )
-        # if request.method == 'POST':
-        #     if user == request.user:
-        #         error = {
-        #             'errors': 'Нельзя подписаться на себя.'
-        #         }
-        #         return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        #     obj, created = Subscription.objects.get_or_create(
-        #         user=request.user,
-        #         author=user
-        #     )
-        #     if not created:
-        #         error = {
-        #             'errors': 'Вы уже подписаны на этого автора'
-        #         }
-        #         return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        #     serializer = SubscriptionShowSerializer(obj, context={'request': request})
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #
-        # if not subscription:
-        #     error = {
-        #         'errors': 'Вы не подписаны на этого автора.'
-        #     }
-        #     return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        # subscription.delete()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
     @action(detail=False, methods=['GET'])
     def subscriptions(self, request):
-        queryset = Subscription.objects.filter(user=request.user)
+        queryset = Subscription.objects.filter(user=request.user).prefetch_related('author')
         queryset = self.filter_queryset(queryset)
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = SubscriptionShowSerializer(
                 page, many=True, context={'request': request}
             )
             return self.get_paginated_response(serializer.data)
-
         serializer = SubscriptionShowSerializer(
             queryset, many=True, context={'request': request}
         )
         return Response(serializer.data)
 
 
-
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-
 
 
 class IngredientsViewSet(ModelViewSet):
