@@ -39,8 +39,8 @@ class CustomUserViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
-        ["POST", "DELETE"],
         detail=True,
+        methods=('POST', 'DELETE'),
     )
     def subscribe(self, request, **kwargs):
         user = self.get_object()
@@ -59,7 +59,9 @@ class CustomUserViewSet(UserViewSet):
         Subscription.objects.filter(user=request.user, author=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['GET'])
+    @action(
+        detail=False,
+        methods=('GET'))
     def subscriptions(self, request):
         queryset = Subscription.objects.filter(user=request.user).prefetch_related('author')
         queryset = self.filter_queryset(queryset)
@@ -84,6 +86,7 @@ class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
+
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
@@ -101,30 +104,19 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
-        url_path='favorite',
     )
-    def favorite(self, request, pk  = None):
+    def favorite(self, request, pk = None):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        favorite = Favorite.objects.filter(
-            user=user,
-            recipe=recipe
-        )
+        favorite = Favorite.objects.filter(user=user, recipe=recipe)
         if request.method == 'POST':
             if favorite.exists():
-                error = {
-                    'errors': 'Рецепт уже в избранном.'
-                }
-                return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            Favorite(
-                user=user,
-                recipe=recipe
-            ).save()
+                raise ValidationError('Рецепт уже в избранном.')
+            Favorite.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubscriptionsSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not favorite.exists():
-            error = {'errors': 'Рецепта нет в избранном.'}
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Рецепта нет в избранном.')
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
