@@ -147,14 +147,11 @@ class RecipeViewSet(ModelViewSet):
 
         user = request.user
         ingredients = RecipeIngredient.objects.filter(
-            recipe__carts__user=user
-        ).values(
+            recipe__carts__user=user).values(
             'ingredient__name',
-            'ingredient__measurement_unit',
-        ).annotate(
+            'ingredient__measurement_unit').annotate(
             total_amount=Sum('amount')
         )
-
         ingredients_dict = {}
         for ingredient in ingredients:
             name = ingredient['ingredient__name']
@@ -168,14 +165,12 @@ class RecipeViewSet(ModelViewSet):
                     'total_amount': amount,
                     'measurement_unit': unit,
                 }
-
         content = 'Список покупок:\n\n'
         for ingredient in ingredients_dict.values():
             name = ingredient['name']
             amount = ingredient['total_amount']
             unit = ingredient['measurement_unit']
             content += f'{name} - {amount} {unit}\n'
-
         filename = 'Cart.txt'
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={slugify(filename)}'
