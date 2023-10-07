@@ -36,7 +36,6 @@ class User(AbstractUser):
         return self.first_name + ' ' + self.last_name
 
 
-
 class Subscription(models.Model):
     user = models.ForeignKey(
         User,

@@ -6,18 +6,18 @@ from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from api.serializers import TagSerializer, RecipeSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
 from recipes.models import Tag, Recipe, Ingredient, Favorite, RecipeIngredient, Cart
 from users.models import User, Subscription
-from api.pagination import CustomPagination
 from api.filter import RecipeFilter
 
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
-    pagination_class = CustomPagination
+    pagination_class = PageNumberPagination
 
 
     def get_serializer_class(self):
@@ -89,7 +89,7 @@ class IngredientsViewSet(ModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    pagination_class = CustomPagination
+    pagination_class = PageNumberPagination
     filter_backends = DjangoFilterBackend,
     filterset_class = RecipeFilter
 
