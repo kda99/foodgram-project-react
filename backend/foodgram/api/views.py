@@ -89,18 +89,21 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
 
 
 class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
 
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = PageNumberPagination
-    filter_backends = DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):
