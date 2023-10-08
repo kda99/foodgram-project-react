@@ -1,6 +1,6 @@
-from rest_framework import permissions
-
-from users.models import User
+# from rest_framework import permissions
+#
+# from users.models import User
 
 
 # class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -17,9 +17,6 @@ from users.models import User
 #         )
 
 
-
-
-
 # class UserPermission(permissions.BasePermission):
 #     def has_permission(self, request, view):
 #         if view.action == 'create':
@@ -33,7 +30,7 @@ from users.models import User
 #         elif view.action == 'update':
 #             # Логика для разрешения действия "update"
 #             return True
-#         elif view.action == 'partial_update':
+#         elif view.action == 'partial_update':ons
 #             # Логика для разрешения действия "partial_update"
 #             return True
 #         elif view.action == 'destroy':

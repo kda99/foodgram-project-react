@@ -131,3 +131,5 @@ dmypy.json
 # .idea
 .idea
 /recipes/cold-bottle-of-beer-with-drops-isolated-on-white-background.jpg
+/backend/foodgram/media/recipes/
+/backend/foodgram/media/recipes_photos/

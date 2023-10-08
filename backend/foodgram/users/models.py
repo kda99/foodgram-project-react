@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import UniqueConstraint
 from django.db import models
+from django.db.models import UniqueConstraint
 
 
 class User(AbstractUser):
@@ -49,6 +49,7 @@ class Subscription(models.Model):
         related_name='followed',
         verbose_name='Подписываемый автор',
     )
+
     class Meta:
         constraints = [
             UniqueConstraint(fields=['user', 'author'],

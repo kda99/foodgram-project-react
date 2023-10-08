@@ -1,21 +1,17 @@
 import re
+
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.core.exceptions import ValidationError
-# from django.contrib.auth import get_user_model
-
 from django.db.models import UniqueConstraint
-
 from users.models import User
-
-
-# User = get_user_model()
 
 
 def validate_hex_color(value):
     pattern = r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
     if not re.match(pattern, value):
-        raise ValidationError('Неверный формат цвета. Цвет должен быть в формате HEX: #FFFFFF')
+        raise ValidationError('Неверный формат цвета. Цвет должен быть в'
+                              ' формате HEX: #FFFFFF')
 
 
 class Tag(models.Model):
@@ -120,7 +116,6 @@ class Recipe(models.Model):
         auto_now_add=True,
     )
 
-
     class Meta:
         ordering = ['-pub_date']
         verbose_name = 'Рецепт'
@@ -128,6 +123,7 @@ class Recipe(models.Model):
         constraints = [
             UniqueConstraint(fields=['name', 'author'], name='unique_recipe'),
         ]
+
     def __str__(self):
         return str(self.name)
 

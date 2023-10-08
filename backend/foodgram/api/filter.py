@@ -1,6 +1,5 @@
 from django_filters import rest_framework
-
-from recipes.models import Recipe, Favorite, Tag
+from recipes.models import Recipe, Tag
 
 
 class RecipeFilter(rest_framework.FilterSet):
@@ -26,10 +25,12 @@ class RecipeFilter(rest_framework.FilterSet):
 
     def get_favorited_filter(self, queryset, value):
         if value:
-            return queryset.prefetch_related('favorite').filter(favorite__user=self.request.user)
+            return (queryset.prefetch_related('favorite')
+                    .filter(favorite__user=self.request.user))
         return queryset
 
     def get_shopping_cart_filter(self, queryset, value):
         if value:
-            return queryset.prefetch_related('carts').filter(carts__user=self.request.user)
+            return (queryset.prefetch_related('carts')
+                    .filter(carts__user=self.request.user))
         return queryset

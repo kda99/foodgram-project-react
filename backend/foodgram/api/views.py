@@ -3,28 +3,32 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import status, permissions
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from api.serializers import TagSerializer, RecipeSerializer, RecipeIngredientSerializer, PasswordSetSerializer, UserCreateSerializer, RecipeCreateSerializer, IngredientSerializer, UserSubscripterSeralizer, SubscriptionShowSerializer, RecipeSubscriptionsSerializer, UserGetSerializer
-from recipes.models import Tag, Recipe, Ingredient, Favorite, RecipeIngredient, Cart
-from users.models import User, Subscription
+from users.models import Subscription, User
+
 from api.filter import RecipeFilter
+from api.serializers import (IngredientSerializer, PasswordSetSerializer,
+                             RecipeCreateSerializer, RecipeSerializer,
+                             RecipeSubscriptionsSerializer,
+                             SubscriptionShowSerializer, TagSerializer,
+                             UserCreateSerializer, UserGetSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = PageNumberPagination
 
-
     def get_permissions(self):
         if self.action in ('retrieve', 'create'):
             self.permission_classes = [permissions.AllowAny, ]
         return super(self.__class__, self).get_permissions()
-
 
     def get_serializer_class(self):
 
@@ -51,14 +55,19 @@ class CustomUserViewSet(UserViewSet):
     )
     def subscribe(self, request, **kwargs):
         user = self.get_object()
-        subscription = Subscription.objects.filter(user=request.user, author=user).exists()
+        subscription = Subscription.objects.filter(user=request.user,
+                                                   author=user).exists()
         if request.method == 'POST':
             if user == request.user:
                 raise ValidationError('Нельзя подписаться на себя.')
             if not subscription:
-                obj = Subscription.objects.create(user=request.user, author=user)
-                serializer = SubscriptionShowSerializer(obj, context={'request': request})
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                obj = Subscription.objects.create(user=request.user,
+                                                  author=user)
+                serializer = SubscriptionShowSerializer(
+                    obj, context={'request': request}
+                )
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
             else:
                 raise ValidationError('Вы уже подписаны на этого автора.')
         if not subscription:
@@ -69,10 +78,11 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=False,
         methods=('GET',),
-        permission_classes = (permissions.IsAuthenticated,)
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def subscriptions(self, request):
-        queryset = Subscription.objects.filter(user=request.user).prefetch_related('author')
+        queryset = (Subscription.objects.filter(user=request.user)
+                    .prefetch_related('author'))
         queryset = self.filter_queryset(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -118,7 +128,7 @@ class RecipeViewSet(ModelViewSet):
         methods=('POST', 'DELETE'),
         permission_classes=(permissions.IsAuthenticated,)
     )
-    def favorite(self, request, pk = None):
+    def favorite(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         favorite = Favorite.objects.filter(user=user, recipe=recipe)
@@ -188,5 +198,6 @@ class RecipeViewSet(ModelViewSet):
             content += f'{name} - {amount} {unit}\n'
         filename = 'Cart.txt'
         response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = f'attachment; filename={slugify(filename)}'
+        response['Content-Disposition'] = (f'attachment;'
+                                           f' filename={slugify(filename)}')
         return response
