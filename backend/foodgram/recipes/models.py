@@ -143,6 +143,10 @@ class RecipeIngredient(models.Model):
     class Meta:
         ordering = ['id']
         verbose_name = 'Количество ингредиента в рецепте'
+        constraints = [
+            UniqueConstraint(fields=['recipe', 'ingredient'], name='unique_recipe_ingredient'),
+        ]
+
 
 
 class Favorite(models.Model):

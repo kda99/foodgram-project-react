@@ -99,13 +99,15 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [permissions.IsAuthenticated, ]
+    pagination_class = None
+    # permission_classes = [permissions.IsAuthenticated, ]
 
 
 class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = [permissions.IsAuthenticated, ]
+    pagination_class = None
+    # permission_classes = [permissions.IsAuthenticated, ]
 
 
 class RecipeViewSet(ModelViewSet):
