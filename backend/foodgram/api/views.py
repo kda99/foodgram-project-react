@@ -3,15 +3,12 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Cart, Favorite, Ingredient, Recipe,
-                            RecipeIngredient, Tag)
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from users.models import Subscription, User
 
 from api.filter import RecipeFilter
 from api.serializers import (IngredientSerializer, PasswordSetSerializer,
@@ -19,6 +16,9 @@ from api.serializers import (IngredientSerializer, PasswordSetSerializer,
                              RecipeSubscriptionsSerializer,
                              SubscriptionShowSerializer, TagSerializer,
                              UserCreateSerializer, UserGetSerializer)
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
+from users.models import Subscription, User
 
 
 class CustomUserViewSet(UserViewSet):
