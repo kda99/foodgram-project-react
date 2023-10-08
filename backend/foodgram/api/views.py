@@ -3,7 +3,7 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -18,6 +18,7 @@ from api.filter import RecipeFilter
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = PageNumberPagination
+
 
 
     def get_serializer_class(self):
@@ -41,6 +42,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
         user = self.get_object()
@@ -61,7 +63,9 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        methods=('GET'))
+        methods=('GET',),
+        permission_classes = (permissions.IsAuthenticated,)
+    )
     def subscriptions(self, request):
         queryset = Subscription.objects.filter(user=request.user).prefetch_related('author')
         queryset = self.filter_queryset(queryset)
