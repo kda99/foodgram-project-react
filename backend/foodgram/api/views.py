@@ -20,6 +20,11 @@ class CustomUserViewSet(UserViewSet):
     pagination_class = PageNumberPagination
 
 
+    def get_permissions(self):
+        if self.action in ('retrieve', 'create'):
+            self.permission_classes = [permissions.AllowAny, ]
+        return super(self.__class__, self).get_permissions()
+
 
     def get_serializer_class(self):
 
@@ -35,14 +40,14 @@ class CustomUserViewSet(UserViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        user.set_password(password)  # Задаем пароль
+        user.set_password(password)  # Задаём пароль
         user.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
-        permission_classes=(permissions.IsAuthenticated,)
+        permission_classes=(permissions.IsAuthenticated,),
     )
     def subscribe(self, request, **kwargs):
         user = self.get_object()
@@ -108,6 +113,7 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def favorite(self, request, pk = None):
         user = request.user
@@ -127,6 +133,7 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def shopping_cart(self, request, pk=None):
         user = request.user
@@ -146,6 +153,7 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=False,
         methods=('GET',),
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
 
