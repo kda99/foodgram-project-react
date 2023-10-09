@@ -12,23 +12,23 @@ class RecipeIngredientInline(admin.TabularInline):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'color',
-        'slug',
+        "name",
+        "color",
+        "slug",
     )
-    search_fields = ('name',)
-    list_filter = ('name',)
+    search_fields = ("name",)
+    list_filter = ("name",)
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'author',
+        "name",
+        "author",
     )
-    search_fields = ('name',)
-    list_filter = ('author', 'name', 'tags')
-    list_display_links = ('name',)
+    search_fields = ("name",)
+    list_filter = ("author", "name", "tags")
+    list_display_links = ("name",)
     inlines = [
         RecipeIngredientInline,
     ]
@@ -37,28 +37,28 @@ class RecipeAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'measurement_unit',
+        "name",
+        "measurement_unit",
     )
-    search_fields = ('name',)
-    list_filter = ('name', 'measurement_unit')
+    search_fields = ("name",)
+    list_filter = ("name", "measurement_unit")
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
-        'recipe',
-        'user',
+        "recipe",
+        "user",
     )
-    search_fields = ('recipe',)
-    list_filter = ('recipe', 'user')
+    search_fields = ("recipe",)
+    list_filter = ("recipe", "user")
 
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = (
-        'recipe',
-        'user',
+        "recipe",
+        "user",
     )
-    search_fields = ('recipe',)
-    list_filter = ('recipe', 'user')
+    search_fields = ("recipe",)
+    list_filter = ("recipe", "user")
