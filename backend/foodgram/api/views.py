@@ -117,7 +117,7 @@ class RecipeViewSet(ModelViewSet):
         return RecipeSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        recipe = serializer.save(author=self.request.user)
 
     def handle_favorite_or_cart(self, request, model_class, error_message_post, error_message_delete, pk):
         user = request.user

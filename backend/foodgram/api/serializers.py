@@ -68,8 +68,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(many=True,
                                              source='recipe_ingredients',
                                              read_only=True)
-    is_favorited = serializers.BooleanField(default=False)
-    is_in_shopping_cart = serializers.BooleanField(default=False)
 
     class Meta:
         model = Recipe
@@ -82,18 +80,18 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             'image',
             'text',
             'cooking_time',
-            'is_favorited',
-            'is_in_shopping_cart'
         )
 
-    def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        ingredient_ids = [ingredient.get('id') for ingredient in ingredients]
-        if len(ingredient_ids) != len(set(ingredient_ids)):
-            raise serializers.ValidationError("Найдены дублирующиеся ингредиенты")
-        return data
+    def run_validation(self, data):
+        if not data:
+            data = self.initial_data.copy()
+        validated_data = super().run_validation(data)
+        ingredients = data.get('ingredients')
+        validated_data['ingredients'] = ingredients
+        return validated_data
 
-    def create_recipe_ingredients(recipe, ingredients):
+
+    def create_recipe_ingredients(self, recipe, ingredients):
         recipe_ingredients = [
             RecipeIngredient(
                 recipe=recipe,
@@ -106,14 +104,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        self.create_recipe_ingredients(recipe, ingredients)
-        tag_ids = tags_data.values_list('id', flat=True)
+        self.create_recipe_ingredients(recipe=recipe, ingredients=ingredients)
+        tag_ids = [tag.id for tag in tags_data]
         tags = Tag.objects.filter(id__in=tag_ids)
         recipe.tags.set(tags)
-
         return recipe
 
     def to_representation(self, instance):
@@ -126,11 +123,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def update(self, recipe, validated_data):
         recipe.ingredients.clear()
         recipe.tags.clear()
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe.tags.set(tags)
+        RecipeIngredient.objects.filter(recipe=recipe).delete()
         self.create_recipe_ingredients(recipe, ingredients)
         return super().update(recipe, validated_data)
+
 
 class RecipeSubscriptionsSerializer(serializers.ModelSerializer):
 
