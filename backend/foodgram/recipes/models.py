@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
+
 from users.models import User
 
 

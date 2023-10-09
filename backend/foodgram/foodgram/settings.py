@@ -1,6 +1,10 @@
 import os
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv())
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,16 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = \
-    "django-insecure-(g^=se4r#jin5-e613!e!2ctq@(+#lx+p#66cq297%2z5rc8ja"
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    default='django-insecure'
+            '-(g^=se4r#jin5-e613!e!2ctq@(+#lx+p#66cq297%2z5rc8ja')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "0.0.0.0",
-]
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 
 
 STATIC_URL = "/static/"
@@ -81,12 +83,28 @@ WSGI_APPLICATION = "foodgram.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# БД на деплой
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        # бэкенд postgresql
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
+        'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
+
+# локальная разрааботка
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 # Password validation
@@ -107,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
 
