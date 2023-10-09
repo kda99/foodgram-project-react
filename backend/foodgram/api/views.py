@@ -125,12 +125,12 @@ class RecipeViewSet(ModelViewSet):
         obj = model_class.objects.filter(user=user, recipe=recipe)
         if request.method == 'POST':
             if obj.exists():
-                raise ValidationError(error_message_post)
+                return Response({'error': error_message_post}, status=status.HTTP_400_BAD_REQUEST)
             model_class.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubscriptionsSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not obj.exists():
-            raise ValidationError(error_message_delete)
+            return Response({'error': error_message_delete}, status=status.HTTP_400_BAD_REQUEST)
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
