@@ -58,6 +58,6 @@ class Subscription(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=["user", "author"],
-                name="unique_subscription"),]
+                name="unique_subscription"), ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
