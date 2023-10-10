@@ -19,7 +19,8 @@ SECRET_KEY = os.getenv(
             '-(g^=se4r#jin5-e613!e!2ctq@(+#lx+p#66cq297%2z5rc8ja')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+# DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+DEBUG = True
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 
 
@@ -85,26 +86,26 @@ WSGI_APPLICATION = "foodgram.wsgi.application"
 
 # БД на деплой
 
-DATABASES = {
-    'default': {
-        # бэкенд postgresql
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
-        'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', 5432)
-    }
-}
+# DATABASES = {
+#     'default': {
+#         # бэкенд postgresql
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
+#         'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
+#         'HOST': os.getenv('DB_HOST', 'db'),
+#         'PORT': os.getenv('DB_PORT', 5432)
+#     }
+# }
 
 
 # локальная разрааботка
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 
 
 # Password validation

@@ -80,14 +80,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             "cooking_time",
         )
 
-    def run_validation(self, data):
-        if not data:
-            data = self.initial_data.copy()
-        validated_data = super().run_validation(data)
-        ingredients = data.get("ingredients")
-        validated_data["ingredients"] = ingredients
-        return validated_data
-
     def create_recipe_ingredients(self, recipe, ingredients):
         recipe_ingredients = [
             RecipeIngredient(
@@ -100,12 +92,19 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
+    def validate(self, data):
+        validated_data = super().validate(self.initial_data)
+        ingredients = validated_data.get("ingredients")
+        validated_data["ingredients"] = ingredients
+        return validated_data
+
+
     def create(self, validated_data):
         ingredients = validated_data.pop("ingredients")
         tags_data = validated_data.pop("tags")
         recipe = Recipe.objects.create(**validated_data)
         self.create_recipe_ingredients(recipe=recipe, ingredients=ingredients)
-        tag_ids = [tag.id for tag in tags_data]
+        tag_ids = [tag for tag in tags_data]
         tags = Tag.objects.filter(id__in=tag_ids)
         recipe.tags.set(tags)
         return recipe
