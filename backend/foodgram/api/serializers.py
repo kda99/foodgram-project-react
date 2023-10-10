@@ -1,3 +1,5 @@
+from collections import Counter
+
 from django.db import transaction
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -95,6 +97,15 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(self.initial_data)
         ingredients = validated_data.get("ingredients")
+        # проверка дублей ингредиентов
+        ingredient_ids = [ingredient.get("id") for ingredient in ingredients]
+        duplicate_ingredients = [
+            ingredient for ingredient, count in Counter(ingredient_ids).items() if count > 1
+        ]
+        if duplicate_ingredients:
+            raise serializers.ValidationError(
+                f"Найдены дубликаты для идентификаторов ингредиентов: {duplicate_ingredients}"
+            )
         validated_data["ingredients"] = ingredients
         return validated_data
 
