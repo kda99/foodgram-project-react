@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv(
     default='django-insecure'
             '-(g^=se4r#jin5-e613!e!2ctq@(+#lx+p#66cq297%2z5rc8ja')
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 
