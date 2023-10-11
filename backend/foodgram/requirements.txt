@@ -3,4 +3,5 @@ djangorestframework
 djoser
 drf-extra-fields
 django_filter
-drf-nested-routers
+python-dotenv
+Pillow
