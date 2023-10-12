@@ -64,9 +64,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
     author = UserGetSerializer(many=False, read_only=True)
-    image = Base64ImageField()
+    image = Base64ImageField(max_length=10485760)
     ingredients = RecipeIngredientSerializer(
-        many=True, source="recipe_ingredients", read_only=True
+        many=True, source="recipe_ingredients",
+        read_only=True
     )
 
     class Meta:
@@ -95,8 +96,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def validate(self, data):
-        validated_data = super().validate(self.initial_data)
-        ingredients = validated_data.get("ingredients")
+        image = data.pop("image")
+        data.pop("tags")
+        tags = self.initial_data.get("tags")
+        validated_data = super().validate(data)
+        ingredients = self.initial_data.get("ingredients")
         ingredient_ids = [ingredient.get("id") for ingredient in ingredients]
         duplicate_ingredients = [
             ingredient for ingredient,
@@ -107,6 +111,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 f" {duplicate_ingredients}"
             )
         validated_data["ingredients"] = ingredients
+        validated_data["image"] = image
+        validated_data["tags"] = tags
         return validated_data
 
     def create(self, validated_data):
