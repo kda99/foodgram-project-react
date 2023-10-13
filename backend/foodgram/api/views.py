@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from api.filter import RecipeFilter
+from api.permissions import IsAuthorOrSU
 from api.serializers import (IngredientSerializer, PasswordSetSerializer,
                              RecipeCreateUpdateSerializer, RecipeSerializer,
                              RecipeSubscriptionsSerializer,
@@ -177,7 +178,8 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=("POST", "DELETE"),
-        permission_classes=(permissions.IsAuthenticated,),
+        permission_classes=(IsAuthorOrSU,),
+        # permission_classes=(permissions.IsAuthenticated,),
     )
     def favorite(self, request, pk=None):
         return self.handle_favorite_or_cart(
@@ -191,7 +193,8 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=True,
         methods=("POST", "DELETE"),
-        permission_classes=(permissions.IsAuthenticated,),
+        permission_classes=(IsAuthorOrSU,),
+        # permission_classes=(permissions.IsAuthenticated,),
     )
     def shopping_cart(self, request, pk=None):
         return self.handle_favorite_or_cart(
@@ -205,7 +208,8 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=False,
         methods=("GET",),
-        permission_classes=(permissions.IsAuthenticated,),
+        permission_classes=(IsAuthorOrSU,),
+        # permission_classes=(permissions.IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
         user = request.user

@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3'
 
 volumes:
   static:
@@ -17,7 +17,9 @@ services:
       - static:/app/result_build/build
 
   nginx:
+#    build: ../infra
     image: nginx:1.25.2-alpine
+#    image: kda99/foodgram_nginx
     ports:
       - "80:80"
     volumes:
