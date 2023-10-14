@@ -1,5 +1,4 @@
 from django_filters import rest_framework
-
 from recipes.models import Recipe, Tag
 
 
