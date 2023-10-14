@@ -1,0 +1,10 @@
+exclude =
+    migrations
+    __pycache__
+    manage.py
+    settings.py
+    venv
+    .venv
+    ./venv
+    venv/
+    .venv/
