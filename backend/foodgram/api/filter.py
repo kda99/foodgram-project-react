@@ -18,14 +18,14 @@ class RecipeFilter(rest_framework.FilterSet):
         model = Recipe
         fields = ("author", "tags", "is_favorited", "is_in_shopping_cart")
 
-    def get_favorited_filter(self, queryset, value):
+    def get_favorited_filter(self, queryset, i, value):
         if value:
             return queryset.prefetch_related("favorite").filter(
                 favorite__user=self.request.user
             )
         return queryset
 
-    def get_shopping_cart_filter(self, queryset, value):
+    def get_shopping_cart_filter(self, queryset, i, value):
         if value:
             return queryset.prefetch_related("carts").filter(
                 carts__user=self.request.user

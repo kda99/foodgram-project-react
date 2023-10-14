@@ -71,7 +71,8 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "measurement_unit",
-                    models.CharField(max_length=200, verbose_name="Единица измерения"),
+                    models.CharField(
+                        max_length=200, verbose_name="Единица измерения"),
                 ),
             ],
             options={
@@ -100,7 +101,8 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "image",
-                    models.ImageField(upload_to="recipes/photos", verbose_name="Фото"),
+                    models.ImageField(
+                        upload_to="recipes/photos", verbose_name="Фото"),
                 ),
                 ("text", models.TextField(verbose_name="Описание")),
                 (

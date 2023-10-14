@@ -61,3 +61,4 @@ class Subscription(models.Model):
                 name="unique_subscription"), ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
+        ordering = ['author',]
