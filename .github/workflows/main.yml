@@ -1,4 +1,4 @@
-name: Ащщепкфь workflow
+name: Foodgram workflow
 
 on:
   push:
