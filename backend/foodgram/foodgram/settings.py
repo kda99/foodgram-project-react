@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='foodgram.freedynamicdns.net').split()
 
 
 STATIC_URL = '/backend_static/'
