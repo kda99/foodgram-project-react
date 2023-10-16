@@ -174,7 +174,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         source: "infra/docker-compose.yml"
-        target: "/"
+        target: "FOODGRAM_DOCKER_PROD"
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
       with:
@@ -186,7 +186,7 @@ jobs:
         # которые нужно выполнить на сервере,
         # с которым установлено соединение
         script: |
-#          cd kittygram_final
+          #cd kittygram_final
           # Выполняет pull образов с Docker Hub
           sudo docker compose -f docker-compose.yml pull
           # Перезапускает все контейнеры в Docker Compose
