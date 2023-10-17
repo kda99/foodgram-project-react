@@ -9,4 +9,5 @@ exclude =
     ./venv
     venv/
     .venv/
+    load_data.py
 ignore = I001, I004
