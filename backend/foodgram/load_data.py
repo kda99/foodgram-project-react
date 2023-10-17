@@ -6,11 +6,11 @@ data = pd.read_csv('ingredients.csv')
 
 # Подключение к базе данных
 conn = psycopg2.connect(
-    host='db',
-    port='5432',
-    user='foodgram_user',
-    password='foodgram_password',
-    database='foodgram'
+    host=DB_HOST,
+    port=DB_PORT,
+    user=POSTGRES_USER,
+    password=POSTGRES_PASSWORD,
+    database=POSTGRES_DB
 )
 cursor = conn.cursor()
 
