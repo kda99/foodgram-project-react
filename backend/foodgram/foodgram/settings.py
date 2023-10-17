@@ -17,7 +17,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='foodgram.freedynamicdns.net').split()
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='foodgram.freedynamicdns.net').split()
+ALLOWED_HOSTS = ['foodgram.freedynamicdns.net', ]
 
 
 STATIC_URL = '/backend_static/'
