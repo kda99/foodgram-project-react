@@ -52,3 +52,7 @@ class Command(BaseCommand):
 
         except FileNotFoundError:
             raise CommandError('Файл отсутствует в директории media/data')
+
+    def run(self, *args, **options):
+        # Вызовите метод handle() для выполнения логики команды
+        self.handle(*args, **options)
