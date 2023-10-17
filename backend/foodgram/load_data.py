@@ -3,7 +3,7 @@ import psycopg2
 
 # Чтение данных из .csv файла
 def load_data():
-    data = pd.read_csv('../../api/scripts/ingredients.csv')
+    data = pd.read_csv('api/scripts/ingredients.csv')
 
     # Подключение к базе данных
     conn = psycopg2.connect(
