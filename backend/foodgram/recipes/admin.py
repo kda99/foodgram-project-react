@@ -40,8 +40,6 @@ class IngredientAdmin(ImportExportModelAdmin):
     pass
 
 
-admin.site.register(Ingredient, IngredientAdmin)
-
 # @admin.register(Ingredient)
 # class IngredientAdmin(admin.ModelAdmin):
 #     list_display = (
@@ -70,3 +68,6 @@ class CartAdmin(admin.ModelAdmin):
     )
     search_fields = ("recipe",)
     list_filter = ("recipe", "user")
+
+
+admin.site.register(Ingredient, IngredientAdmin)
