@@ -11,8 +11,11 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 @admin.register(Ingredient)
-class Ingredient(ImportExportModelAdmin):
+class IngredientsAdmin(ImportExportModelAdmin):
     pass
+
+
+admin.site.register(Ingredient, IngredientsAdmin)
 
 
 @admin.register(Tag)
