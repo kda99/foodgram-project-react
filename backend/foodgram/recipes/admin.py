@@ -1,8 +1,9 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
 
 from recipes.models import (Cart, Favorite, Ingredient, Recipe,
                             RecipeIngredient, Tag)
+
+# from import_export.admin import ImportExportModelAdmin
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -35,19 +36,19 @@ class RecipeAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(Ingredient)
-class IngredientAdmin(ImportExportModelAdmin):
-    pass
-
-
 # @admin.register(Ingredient)
-# class IngredientAdmin(admin.ModelAdmin):
-#     list_display = (
-#         "name",
-#         "measurement_unit",
-#     )
-#     search_fields = ("name",)
-#     list_filter = ("name", "measurement_unit")
+# class IngredientAdmin(ImportExportModelAdmin):
+#     pass
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "measurement_unit",
+    )
+    search_fields = ("name",)
+    list_filter = ("name", "measurement_unit")
 
 
 @admin.register(Favorite)
