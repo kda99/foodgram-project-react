@@ -41,7 +41,7 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
 
   db:
-    image: postgres:13.10
+    image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
