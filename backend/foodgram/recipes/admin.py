@@ -6,6 +6,7 @@ from recipes.models import (Cart, Favorite, Ingredient, Recipe,
 # from import_export.admin import ImportExportModelAdmin
 
 
+
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
     extra = 1
