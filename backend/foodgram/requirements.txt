@@ -11,3 +11,4 @@ django_extensions
 pandas
 sqlalchemy
 django-extensions
+django-import-export
