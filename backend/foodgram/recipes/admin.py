@@ -40,9 +40,6 @@ class IngredientAdmin(ImportExportModelAdmin):
     pass
 
 
-admin.site.register(Ingredient, IngredientAdmin)
-
-
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
