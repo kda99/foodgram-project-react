@@ -5,8 +5,8 @@ from recipes.models import Ingredient
 
 
 @admin.register(Ingredient)
-class IngredientsAdmin(ImportExportModelAdmin):
+class IngredientAdmin(ImportExportModelAdmin):
     pass
 
 
-admin.site.register(Ingredient, IngredientsAdmin)
+admin.site.register(Ingredient, IngredientAdmin)
