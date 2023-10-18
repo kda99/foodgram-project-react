@@ -1,9 +1,9 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from recipes.models import (Cart, Favorite, Ingredient, Recipe,
                             RecipeIngredient, Tag)
-from import_export.admin import ImportExportModelAdmin
-from .models import Ingredient
+
 
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
@@ -11,7 +11,7 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 @admin.register(Ingredient)
-class ProductAdmin(ImportExportModelAdmin):
+class Ingredient(ImportExportModelAdmin):
     pass
 
 
