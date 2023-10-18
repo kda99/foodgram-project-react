@@ -64,6 +64,3 @@ class CartAdmin(admin.ModelAdmin):
     )
     search_fields = ("recipe",)
     list_filter = ("recipe", "user")
-
-
-admin.site.register(Ingredient, IngredientAdmin)
