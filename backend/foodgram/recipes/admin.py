@@ -42,8 +42,15 @@ class IngredientResource(resources.ModelResource):
     # Перечислите поля модели, которые вы хотите импортировать из файла CSV
         fields = ('name', 'measurement_unit',)
 
-    def import_id_fields(self):
-        return []
+    def get_instance(self, instance_loader, row):
+        # Используйте другое поле для идентификации записей, например, 'field1'
+        field1_value = row.get('name')
+        try:
+            # Попытайтесь найти запись по полю 'field1'
+            instance = instance_loader.get_queryset().get(name=field1_value)
+            return instance
+        except Ingredient.DoesNotExist:
+            return None
 
 
 @admin.register(Ingredient)
