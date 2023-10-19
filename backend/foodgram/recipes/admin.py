@@ -39,8 +39,11 @@ class RecipeAdmin(admin.ModelAdmin):
 class IngredientResource(resources.ModelResource):
     class Meta:
         model = Ingredient
-        # Перечислите поля модели, которые вы хотите импортировать из файла CSV
+    # Перечислите поля модели, которые вы хотите импортировать из файла CSV
         fields = ('name', 'measurement_unit',)
+
+    def import_id_fields(self):
+        return []
 
 
 @admin.register(Ingredient)
