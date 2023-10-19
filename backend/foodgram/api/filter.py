@@ -1,6 +1,16 @@
 from django_filters import rest_framework
 
-from recipes.models import Recipe, Tag
+from recipes.models import Recipe, Tag, Ingredient
+
+
+class IngredientFilter(rest_framework.FilterSet):
+    name = rest_framework.CharFilter(field_name="name", lookup_expr="icontains")
+    measurement_unit = rest_framework.CharFilter(
+        field_name="measurement_unit", lookup_expr="icontains")
+
+    class Meta:
+        model = Ingredient
+        fields = ("name", "measurement_unit")
 
 
 class RecipeFilter(rest_framework.FilterSet):

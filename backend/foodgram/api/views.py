@@ -117,31 +117,16 @@ class TagViewSet(ModelViewSet):
 class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (DjangoFilterBackend,)
-    search_fields = ("^name",)
+    # filter_backends = (DjangoFilterBackend,)
+    # search_fields = ("^name",)
     pagination_class = None
-
-    # def get_queryset(self):
-    #     queryset = super().get_queryset()
-    #     query = self.request.GET.get("name")
-    #     if query:
-    #         queryset = queryset.filter(Q(name__icontains=query))
-    #     return queryset
-    #
-    # def list(self, request, *args, **kwargs):
-    #     queryset = self.get_queryset()
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response(serializer.data)
 
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend,)
+    # filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    # permission_classes = [
-    #     permissions.IsAuthenticated,
-    # ]
 
     def get_permissions(self):
         if self.action in ("retrieve", "list"):
