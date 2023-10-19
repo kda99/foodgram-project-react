@@ -2,7 +2,7 @@ Django==3.2
 djangorestframework
 djoser
 drf-extra-fields
-django_filter
+django-filter==21.1
 python-dotenv
 Pillow
 django-cors-headers==3.13.0

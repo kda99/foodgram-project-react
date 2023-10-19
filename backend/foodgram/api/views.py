@@ -1,4 +1,4 @@
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,7 +16,8 @@ from api.serializers import (IngredientSerializer, PasswordSetSerializer,
                              RecipeSubscriptionsSerializer,
                              SubscriptionShowSerializer, TagSerializer,
                              UserCreateSerializer, UserGetSerializer)
-from recipes.models import Cart, Favorite, Recipe, RecipeIngredient, Tag
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
 from users.models import Subscription, User
 
 
@@ -110,28 +111,27 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    # permission_classes = [
-    #     permissions.IsAuthenticated,
-    # ]
     pagination_class = None
 
 
 class IngredientsViewSet(ModelViewSet):
-    # queryset = Ingredient.objects.all()
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filter_backends = (DjangoFilterBackend,)
+    search_fields = ("^name",)
     pagination_class = None
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        query = self.request.GET.get("name")
-        if query:
-            queryset = queryset.filter(Q(name__icontains=query))
-        return queryset
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     query = self.request.GET.get("name")
+    #     if query:
+    #         queryset = queryset.filter(Q(name__icontains=query))
+    #     return queryset
+    #
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.get_queryset()
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
 
 
 class RecipeViewSet(ModelViewSet):
