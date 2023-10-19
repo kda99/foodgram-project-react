@@ -7,7 +7,6 @@ from import_export.formats.base_formats import CSV, JSON
 
 IMPORT_EXPORT_FORMATS = [CSV, JSON]
 
-
 load_dotenv(find_dotenv())
 
 # BASE_DIR = Path(__file__).resolve().parent.parent
