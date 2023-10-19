@@ -1,11 +1,11 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
-from import_export.formats.base_formats import CSV
+from import_export.formats.base_formats import CSV, JSON
 # from pathlib import Path
 
 
-IMPORT_EXPORT_FORMATS = [CSV]
+IMPORT_EXPORT_FORMATS = [CSV, JSON]
 
 
 load_dotenv(find_dotenv())
