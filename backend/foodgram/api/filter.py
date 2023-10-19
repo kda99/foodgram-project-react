@@ -6,12 +6,12 @@ from recipes.models import Ingredient, Recipe, Tag
 class IngredientFilter(rest_framework.FilterSet):
     name = rest_framework.CharFilter(field_name="name",
                                      lookup_expr="icontains")
-    measurement_unit = rest_framework.CharFilter(
-        field_name="measurement_unit", lookup_expr="icontains")
+    # measurement_unit = rest_framework.CharFilter(
+    #     field_name="measurement_unit", lookup_expr="icontains")
 
     class Meta:
         model = Ingredient
-        fields = ("name", "measurement_unit")
+        fields = ("name",)
 
 
 class RecipeFilter(rest_framework.FilterSet):

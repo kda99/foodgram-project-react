@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.filter import RecipeFilter
+from api.filter import IngredientFilter, RecipeFilter
 from api.permissions import IsAuthorOrSU
 from api.serializers import (IngredientSerializer, PasswordSetSerializer,
                              RecipeCreateUpdateSerializer, RecipeSerializer,
@@ -119,6 +119,7 @@ class IngredientsViewSet(ModelViewSet):
     serializer_class = IngredientSerializer
     # filter_backends = (DjangoFilterBackend,)
     # search_fields = ("^name",)
+    filter_class = IngredientFilter
     pagination_class = None
 
 
