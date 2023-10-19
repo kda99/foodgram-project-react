@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
 from recipes.models import (Cart, Favorite, Ingredient, Recipe,
@@ -35,9 +36,16 @@ class RecipeAdmin(admin.ModelAdmin):
     ]
 
 
+class IngredientResource(resources.ModelResource):
+    class Meta:
+        model = Ingredient
+        # Перечислите поля модели, которые вы хотите импортировать из файла CSV
+        fields = ('name', 'measurement_unit',)
+
+
 @admin.register(Ingredient)
 class IngredientAdmin(ImportExportModelAdmin):
-    pass
+    resource_class = IngredientResource
 
 
 @admin.register(Favorite)

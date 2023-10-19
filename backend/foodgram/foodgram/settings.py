@@ -1,10 +1,11 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
-
+from import_export.formats.base_formats import CSV
 # from pathlib import Path
 
 
+IMPORT_EXPORT_FORMATS = [CSV]
 
 
 load_dotenv(find_dotenv())
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'import_export',
     'django_extensions',
     "rest_framework",
     "rest_framework.authtoken",
