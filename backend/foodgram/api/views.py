@@ -11,7 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from api.filter import IngredientFilter, RecipeFilter
+from api.filter import RecipeFilter
 from api.permissions import IsAuthorOrSU
 from api.serializers import (IngredientSerializer, PasswordSetSerializer,
                              RecipeCreateUpdateSerializer, RecipeSerializer,
