@@ -124,7 +124,7 @@ class TagViewSet(ModelViewSet):
 
 
 class IngredientFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr='istartwith')
+    name = filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
         model = Ingredient
@@ -135,7 +135,6 @@ class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = [DjangoFilterBackend,]
-    # search_fields = ("^name",)
     filter_class = IngredientFilter
     pagination_class = None
 
