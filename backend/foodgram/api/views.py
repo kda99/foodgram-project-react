@@ -116,21 +116,28 @@ class TagViewSet(ModelViewSet):
     pagination_class = None
 
 
-class IngredientSearchFilter(SearchFilter):
-    name = filters.CharFilter(lookup_expr='startswith')
+# class IngredientSearchFilter(SearchFilter):
+#     name = filters.CharFilter(lookup_expr='startswith')
+#
+#     class Meta:
+#         model = Ingredient
+#         fields = ['name']
+
+
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr='istartwith')
 
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ('name',)
 
 
 class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = [IngredientSearchFilter]
-    search_fields = ('^name',)
+    filter_backends = [DjangoFilterBackend,]
     # search_fields = ("^name",)
-    # filter_class = IngredientFilter
+    filter_class = IngredientFilter
     pagination_class = None
 
 
