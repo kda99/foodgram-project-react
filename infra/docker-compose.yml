@@ -10,7 +10,8 @@ services:
 
 
   backend:
-    image: kda99/foodgram_backend
+#    image: kda99/foodgram_backend
+    build: ../backend/foodgram
     restart: always
     volumes:
       - backend_static:/app/static
