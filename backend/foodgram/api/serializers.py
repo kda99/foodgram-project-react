@@ -96,7 +96,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 )
                 recipe_ingredients.append(recipe_ingredient)
             else:
-                raise serializers.ValidationError("Количество ингредиента не может быть отрицательным.")
+                raise serializers.ValidationError(
+                    "Количество ингредиента не может быть отрицательным.")
         with transaction.atomic():
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
@@ -144,7 +145,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         # Обновление полей, кроме изображения
         recipe.name = validated_data.get('name', recipe.name)
         recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.get('cooking_time', recipe.cooking_time)
+        recipe.cooking_time = validated_data.get('cooking_time',
+                                                 recipe.cooking_time)
 
         # Обновление связанных полей
         tags_data = validated_data.get('tags')
