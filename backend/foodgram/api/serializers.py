@@ -84,14 +84,19 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
     def create_recipe_ingredients(self, recipe, ingredients):
-        recipe_ingredients = [
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient_id=ingredient.get("id"),
-                amount=ingredient.get("amount"),
-            )
-            for ingredient in ingredients
-        ]
+        recipe_ingredients = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient.get("id")
+            amount = ingredient.get("amount")
+            if int(amount) > 0:
+                recipe_ingredient = RecipeIngredient(
+                    recipe=recipe,
+                    ingredient_id=ingredient_id,
+                    amount=amount,
+                )
+                recipe_ingredients.append(recipe_ingredient)
+            else:
+                raise serializers.ValidationError("Количество ингредиента не может быть отрицательным.")
         with transaction.atomic():
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
