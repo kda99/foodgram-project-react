@@ -56,19 +56,19 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def subscribe(self, request, **kwargs):
-        user = self.get_object()
+        user = self.get_object().pk
         subscription = Subscription.objects.filter(
-            user=request.user, author=user
+            user=request.user.id, author=user
         ).exists()
         if request.method == "POST":
-            if user == request.user:
+            if user == request.user.id:
                 return Response(
                     {"detail": "Нельзя подписаться на себя."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             if not subscription:
                 obj = Subscription.objects.create(
-                    user=request.user, author=user)
+                    user=request.user, author_id=user)
                 serializer = SubscriptionShowSerializer(
                     obj, context={"request": request}
                 )
@@ -85,8 +85,46 @@ class CustomUserViewSet(UserViewSet):
                 {"detail": "Вы не подписаны на этого автора."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        Subscription.objects.filter(user=request.user, author=user).delete()
+        Subscription.objects.filter(user=request.user.id, author=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # @action(
+    #     detail=True,
+    #     methods=("POST", "DELETE"),
+    #     permission_classes=(permissions.IsAuthenticated,),
+    # )
+    # def subscribe(self, request, **kwargs):
+    #     user = self.get_object()
+    #     subscription = Subscription.objects.filter(
+    #         user=request.user, author=user
+    #     ).exists()
+    #     if request.method == "POST":
+    #         if user == request.user:
+    #             return Response(
+    #                 {"detail": "Нельзя подписаться на себя."},
+    #                 status=status.HTTP_400_BAD_REQUEST,
+    #             )
+    #         if not subscription:
+    #             obj = Subscription.objects.create(
+    #                 user=request.user, author=user)
+    #             serializer = SubscriptionShowSerializer(
+    #                 obj, context={"request": request}
+    #             )
+    #             return Response(
+    #                 serializer.data,
+    #                 status=status.HTTP_201_CREATED)
+    #         else:
+    #             return Response(
+    #                 {"detail": "Вы уже подписаны на этого автора."},
+    #                 status=status.HTTP_400_BAD_REQUEST,
+    #             )
+    #     if not subscription:
+    #         return Response(
+    #             {"detail": "Вы не подписаны на этого автора."},
+    #             status=status.HTTP_400_BAD_REQUEST,
+    #         )
+    #     Subscription.objects.filter(user=request.user, author=user).delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,

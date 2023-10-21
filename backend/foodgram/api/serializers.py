@@ -279,7 +279,10 @@ class SubscriptionShowSerializer(serializers.ModelSerializer):
     def get_recipes(self, data):
         recipes_limit = self.context.get(
             "request").query_params.get("recipes_limit")
-        recipes = data.author.recipes.all()[: int(recipes_limit)]
+        if recipes_limit is not None:
+            recipes = data.author.recipes.all()[: int(recipes_limit)]
+        else:
+            recipes = data.author.recipes.all()
         return RecipeSubscriptionsSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
