@@ -1,7 +1,7 @@
+import django_filters
 from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.utils.text import slugify
-import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import permissions, status
@@ -115,14 +115,6 @@ class TagViewSet(ModelViewSet):
     pagination_class = None
 
 
-# class IngredientSearchFilter(SearchFilter):
-#     name = filters.CharFilter(lookup_expr='startswith')
-#
-#     class Meta:
-#         model = Ingredient
-#         fields = ['name']
-
-
 class IngredientFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='istartswith')
 
@@ -134,7 +126,7 @@ class IngredientFilter(django_filters.FilterSet):
 class IngredientsViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = IngredientFilter
     pagination_class = None
 
