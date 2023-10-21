@@ -96,7 +96,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def validate(self, data):
-        image = data.pop("image")
+        # image = data.pop("image")
+        image = data.get("image")
+        if image is not None:
+            data.pop("image")
         data.pop("tags")
         tags = self.initial_data.get("tags")
         validated_data = super().validate(data)
@@ -133,14 +136,28 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return representation
 
     def update(self, recipe, validated_data):
-        recipe.ingredients.clear()
-        recipe.tags.clear()
-        ingredients = validated_data.pop("ingredients")
-        tags = validated_data.pop("tags")
-        recipe.tags.set(tags)
-        RecipeIngredient.objects.filter(recipe=recipe).delete()
-        self.create_recipe_ingredients(recipe, ingredients)
-        return super().update(recipe, validated_data)
+        # Обновление полей, кроме изображения
+        recipe.name = validated_data.get('name', recipe.name)
+        recipe.text = validated_data.get('text', recipe.text)
+        recipe.cooking_time = validated_data.get('cooking_time', recipe.cooking_time)
+
+        # Обновление связанных полей
+        tags_data = validated_data.get('tags')
+        if tags_data:
+            recipe.tags.set(tags_data)
+
+        ingredients_data = validated_data.get('ingredients')
+        if ingredients_data:
+            RecipeIngredient.objects.filter(recipe=recipe).delete()
+            self.create_recipe_ingredients(recipe, ingredients_data)
+
+        # Сохранение изображения
+        image = validated_data.get('image')
+        if image:
+            recipe.image = image
+        recipe.save()
+
+        return recipe
 
 
 class RecipeSubscriptionsSerializer(serializers.ModelSerializer):
